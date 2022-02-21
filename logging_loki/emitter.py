@@ -12,6 +12,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
+import urllib.request
 import requests
 import rfc3339
 
@@ -52,7 +53,10 @@ class LokiEmitter(abc.ABC):
     def __call__(self, record: logging.LogRecord, line: str):
         """Send log record to Loki."""
         payload = self.build_payload(record, line)
-        resp = self.session.post(self.url, json=payload)
+        proxies = urllib.request.getproxies()
+        if proxies:
+            proxies["https"] = proxies["http"]
+        resp = self.session.post(self.url, json=payload, proxies=proxies)
         if resp.status_code != self.success_response_code:
             raise ValueError("Unexpected Loki API response status code: {0}".format(resp.status_code))
 
