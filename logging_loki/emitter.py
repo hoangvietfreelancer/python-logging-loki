@@ -56,7 +56,7 @@ class LokiEmitter(abc.ABC):
         proxies = urllib.request.getproxies()
         if proxies:
             proxies["https"] = proxies["http"]
-        resp = self.session.post(self.url, json=payload, proxies=proxies)
+        resp = self.session.post(self.url, json=payload, proxies=proxies, timeout=2)
         if resp.status_code != self.success_response_code:
             raise ValueError("Unexpected Loki API response status code: {0}".format(resp.status_code))
 
