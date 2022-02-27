@@ -53,9 +53,7 @@ class LokiEmitter(abc.ABC):
     def __call__(self, record: logging.LogRecord, line: str):
         """Send log record to Loki."""
         payload = self.build_payload(record, line)
-        proxies = urllib.request.getproxies()
-        if proxies:
-            proxies["https"] = proxies["http"]
+        proxies = {"http": None, "https": None}
         resp = self.session.post(self.url, json=payload, proxies=proxies, timeout=5)
         if resp.status_code != self.success_response_code:
             raise ValueError("Unexpected Loki API response status code: {0}".format(resp.status_code))
